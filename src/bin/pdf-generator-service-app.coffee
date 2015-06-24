@@ -10,7 +10,6 @@ express          = require 'express'
 path             = require 'path'
 
 ErrorHandler     = require('error-handler')
-HttpError        = ErrorHandler.HttpError
 
 ###
 Create express server.
@@ -33,7 +32,7 @@ pdfGeneratorService        = require '../pdf-generator-service.js'
 PDFGeneratorMasterJob      = pdfGeneratorService.PDFGeneratorMasterJob
 PDFGeneratorURLContentTask = pdfGeneratorService.PDFGeneratorURLContentTask
 
-app.post '/v1/pdf', (req, res, next) ->
+app.post '/v1', (req, res, next) ->
   recipe = req.body
 
   tasks = _.chain(recipe.tasks)
@@ -56,14 +55,33 @@ app.post '/v1/pdf', (req, res, next) ->
 Catch all 404 handler.
 ###
 app.use '*', (req, res, next) ->
-  next new HttpError 404, message: err.message
+  next new ErrorHandler.NotFoundError()
 
 ###
 Error handler.
 ###
 app.use (err, req, res, next) ->
-  console.error err
-  next new HttpError 500, message: err
+  if err instanceof ErrorHandler.NotFoundError
+    next new ErrorHandler.HttpError 404, message: err.message
+
+  else if err instanceof ErrorHandler.PrivilagesError
+    next new ErrorHandler.HttpError 403, message: err.message
+
+  else if err instanceof ErrorHandler.UnauthorizedError
+    next new ErrorHandler.HttpError 401, message: err.message
+
+  else if err instanceof ErrorHandler.DbError
+    next new ErrorHandler.HttpError 500, message: err.message
+
+  else if err instanceof ErrorHandler.SError
+    next new ErrorHandler.HttpError 500, message: err.message
+
+  else if err instanceof Error
+    next new ErrorHandler.HttpError 500, message: err.message
+
+  else
+    console.error err
+    throw err
 , require('error-handler').handleHttpErrors
 
 
