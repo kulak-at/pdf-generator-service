@@ -84,9 +84,6 @@ class PDFGeneratorURLContentTask extends PDFGeneratorContentTask
     , callback, @zoomFactor
 
   executeOn: (page, callback) ->
-    resourcesRequested = 0
-    resourcesReceived  = 0
-
     alreadyFailed = false
 
     failWithError = (errorMsg) ->
@@ -104,11 +101,14 @@ class PDFGeneratorURLContentTask extends PDFGeneratorContentTask
           'onConsoleMessage': (msg) ->
             console.log "Phantom Console: ", msg
           'onResourceRequested': (res) ->
-            resourcesRequested += 1
+            page.resourcesRequested ?= 0
+            page.resourcesRequested += 1
           'onResourceReceived': (res) ->
             return unless res.stage == 'end'
+
             # Should also handle errors.
-            resourcesReceived += 1
+            page.resourcesReceived ?= 0
+            page.resourcesReceived += 1
           'onUrlChanged': (newURL) =>
             console.log "URL changed to: #{newURL}."
 
@@ -134,23 +134,29 @@ class PDFGeneratorURLContentTask extends PDFGeneratorContentTask
         console.log "open"
 
         @waitFor ((cb) ->
-          cb resourcesRequested == resourcesReceived
+          cb page.resourcesRequested == page.resourcesReceived
         ), next, @timeout
       ]
       'shouldWaitForReady': [ 'allResourcesLoaded', (next, results) =>
-        console.log 'all resources loaded'
-
+        console.log "all resources loaded before waiting for ready"
         @shouldWaitForReady page, (shouldWaitForReady) -> next null, shouldWaitForReady
       ]
-      'waitForReady': [ 'shouldWaitForReady', 'allResourcesLoaded', (next, results) =>
+      'waitForReady': [ 'shouldWaitForReady', (next, results) =>
         console.log "Should wait for ready:", results.shouldWaitForReady
         if results.shouldWaitForReady
           @waitFor @isReadyFn(page), next, @timeout
         else
           next()
       ]
-      'injectStyles': [ 'waitForReady', (next, results) =>
+      'allResourcesLoaded2': [ 'waitForReady', (next, results) =>
         console.log "Ready"
+
+        @waitFor ((cb) ->
+          cb page.resourcesRequested == page.resourcesReceived
+        ), next, @timeout
+      ]
+      'injectStyles': [ 'allResourcesLoaded2', (next, results) =>
+        console.log "all resources loaded before switching page"
         @injectStyles page, () -> next null
       ]
     }, (err, results) =>
