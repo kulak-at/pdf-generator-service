@@ -90,7 +90,7 @@ class PDFGeneratorURLContentTask extends PDFGeneratorContentTask
 
     alreadyFailed = false
 
-    failWithError: (errorMsg) ->
+    failWithError = (errorMsg) ->
       return if alreadyFailed
 
       alreadyFailed = true
@@ -110,7 +110,7 @@ class PDFGeneratorURLContentTask extends PDFGeneratorContentTask
           'onUrlChanged': (newURL) =>
             return if @shouldAllowRedirect newURL
 
-            failWithError "Page navigated to a different URL: <#{newURL}>."
+            failWithError "Disallowed redirect: <#{newURL}>."
         }, next
       'openPage': [ 'setup', (next, results) =>
         page.open @url, (status) ->
