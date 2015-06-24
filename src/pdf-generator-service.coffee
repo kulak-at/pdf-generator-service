@@ -179,7 +179,7 @@ class PDFGeneratorMasterJob
         setPageSettings results.page, {
           'dpi': 96.0
           'viewportSize': { width: '1280px', height: '800px' }
-          'paperSize': { width: '595px', height: '842px', margin: '1cm' }
+          'paperSize': { format: "A3", orientation: "portrait", margin: '1cm' }
           'customHeaders': @headers
         }, next
       ]
