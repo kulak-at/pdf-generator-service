@@ -1,0 +1,56 @@
+{
+  "name": "pdf-generator-service",
+  "version": "1.0.0",
+  "description": "Awesome module",
+  "keywords": [
+    "keyword1",
+    "keyword2"
+  ],
+  "homepage": "https://github.com/tkopczuk/pdf-generator-service",
+  "bugs": "https://github.com/tkopczuk/pdf-generator-service/issues",
+  "author": {
+    "name": "Tomek Kopczuk",
+    "email": "",
+    "url": "https://github.com/tkopczuk"
+  },
+  "main": "./lib/pdf-generator-service.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tkopczuk/pdf-generator-service.git"
+  },
+  "scripts": {
+    "test": "gulp test"
+  },
+  "dependencies": {
+    "async": "^1.2.1",
+    "body-parser": "^1.13.1",
+    "error-handler": "git+ssh://git@bitbucket.org:swingdev/error-handler.git",
+    "express": "^4.13.0",
+    "ghostscript": "https://github.com/musubu/node-ghostscript/tarball/master",
+    "lodash": "^3.9.3",
+    "node-slimerjs": "^1.0.1",
+    "phantom": "https://github.com/sgentle/phantomjs-node.git",
+    "phantomjs": "^1.9.17",
+    "slimerjs": "^0.9.5",
+    "source-map-support": "^0.3.1",
+    "temp": "^0.8.3"
+  },
+  "devDependencies": {
+    "chai": "^1.9.1",
+    "coffee-script": "^1.8.0",
+    "gulp": "^3.8.6",
+    "gulp-coffee": "^2.1.1",
+    "gulp-istanbul": "^0.5.0",
+    "gulp-mocha": "^2.0.0",
+    "gulp-plumber": "^1.0.0",
+    "gulp-util": "^3.0.0",
+    "mocha": "^2.0.0",
+    "sinon": "^1.9.1",
+    "sinon-chai": "^2.5.0"
+  },
+  "engines": {
+    "node": ">=0.10.0",
+    "npm": ">=1.2.10"
+  },
+  "license": "MIT"
+}
