@@ -54,7 +54,6 @@ class PDFGeneratorURLContentTask extends PDFGeneratorContentTask
         unless condition
           onReady new Error "Timeout."
         else
-          console.log "Ready"
           onReady()
           clearInterval interval
     , 100
@@ -96,6 +95,9 @@ class PDFGeneratorURLContentTask extends PDFGeneratorContentTask
       alreadyFailed = true
       callback new Error errorMsg
 
+    console.log "Content task started for #{@url}"
+
+    pageDidOpen = false
     async.auto {
       'setup': (next, results) =>
         setPageSettings page, {
@@ -108,15 +110,25 @@ class PDFGeneratorURLContentTask extends PDFGeneratorContentTask
             # Should also handle errors.
             resourcesReceived += 1
           'onUrlChanged': (newURL) =>
-            return if @shouldAllowRedirect newURL
+            console.log "URL changed to: #{newURL}."
 
-            failWithError "Disallowed redirect: <#{newURL}>."
+            unless @shouldAllowRedirect newURL
+              return failWithError "Disallowed redirect: <#{newURL}>."
+
+            if newURL == @url
+              pageDidOpen = true
+          'onLoadFinished': (arg1) =>
+            console.log "onLoadFinished: #{arg1}."
         }, next
       'openPage': [ 'setup', (next, results) =>
-        page.open @url, (status) ->
-          if status != "success"
-            return next new Error "Page loading failure <#{status}>."
-          next()
+        console.log "opening #{@url}"
+        page.open @url#, (status) ->
+          # # console.log "Status: #{status}"
+          # if status != "success"
+          #   return next new Error "Page loading failure <#{status}>."
+          # next()
+
+        @waitFor ((cb) -> cb (pageDidOpen == true)), next, @timeout
       ]
       'allResourcesLoaded': [ 'openPage', (next, results) =>
         console.log "open"
@@ -138,6 +150,7 @@ class PDFGeneratorURLContentTask extends PDFGeneratorContentTask
           next()
       ]
       'injectStyles': [ 'waitForReady', (next, results) =>
+        console.log "Ready"
         @injectStyles page, () -> next null
       ]
     }, (err, results) =>
