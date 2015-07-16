@@ -88,7 +88,7 @@ app.use (err, req, res, next) ->
 ###
 Start express server.
 ###
-app.listen app.get('port'), ->
+app.listen app.get('port'), "127.0.0.1", ->
   console.info "Express server listening on port #{app.get("port")}."
 
 module.exports = app
