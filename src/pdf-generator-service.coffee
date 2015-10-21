@@ -6,7 +6,6 @@ fs    = require 'fs'
 path  = require 'path'
 temp  = require('temp').track()
 
-ghostscript    = require 'ghostscript'
 phantomWrapper = require 'phantom'
 
 # Helpers
@@ -222,6 +221,8 @@ class PDFGeneratorMasterJob
 
         inputPaths = results.contentPDFPaths.join ' '
         outputPath = temp.path { suffix: '.pdf' }
+
+        ghostscript = require 'ghostscript'
 
         ghostscript().batch()
         .quiet()
